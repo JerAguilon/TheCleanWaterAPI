@@ -3,8 +3,6 @@ var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
-
-var jwt = require('jsonwebtoken');
 var config = require('./config');
 var User = require('./app/models/user');
 
@@ -12,7 +10,6 @@ var User = require('./app/models/user');
 var port = process.env.PORT || 8080;
 mongoose.connect(config.database);
 
-app.set('superSecret', config.secret);
 
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
@@ -29,6 +26,18 @@ console.log('Access link: http://localhost:' + port);
 app.get('/setup',function(req, res) {
 	var user = new User({
 		'username' : 'user',
-		'pasword' : 'pass'
+		'password' : 'pass',
+		'responsibility' : 4
 	});
+
+	user.save(function(err) {
+		if (err) throw err;
+	});
+
+	console.log('User saved successfully');
+	res.json({success: true});
 });
+
+var apiRoutes = require('./routes/userRoutes.js');
+app.use('/api/users', apiRoutes);
+
