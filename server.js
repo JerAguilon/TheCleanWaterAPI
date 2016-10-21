@@ -27,7 +27,12 @@ app.get('/setup',function(req, res) {
 	var user = new User({
 		'username' : 'user',
 		'password' : 'pass',
-		'responsibility' : 4
+		'responsibility' : 4,
+		profile: {
+			'email' : 'test@gmail.com',
+			'address' : 'test',
+			'title' : 'Sir'
+		}
 	});
 
 	user.save(function(err) {
