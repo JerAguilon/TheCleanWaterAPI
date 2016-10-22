@@ -5,9 +5,15 @@ var apiRoutes = express.Router();
 var User = require('../app/models/user');
 var jwt = require('jsonwebtoken');
 var app = express();
+var bodyParser = require('body-parser');
 
 var config = require('../config');
+
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.json());
 app.set('superSecret', config.secret);
+
+
 
 
 apiRoutes.post('/authenticate', function(req, res) {
@@ -46,6 +52,42 @@ apiRoutes.post('/authenticate', function(req, res) {
   });
 });
 
+//route to add a user   
+apiRoutes.post('/adduser', function (req, res) {
+  var user = new User({
+    'username' : req.body.username,
+    'password' : req.body.password,
+    'responsibility' : req.body.responsibility,
+    //_id stores the id
+    'profile' : {
+      'email' : req.body.email,
+      'address' : req.body.address,
+      'title' : req.body.title
+    }
+  });
+
+  User.findOne({
+    'username' : req.body.username
+  }, function(err, foundUser) {
+    if (err) throw err;
+
+    if (!foundUser) {
+      user.save(function(err) {
+        if (err) throw err;
+      });
+      res.json({
+        success: true,
+        message: 'User saved successfully',
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'User already exists'
+      });
+    }
+  });
+});
+
 // route middleware to verify a token
 apiRoutes.use(function(req, res, next) {
 
@@ -58,7 +100,6 @@ apiRoutes.use(function(req, res, next) {
     // verifies secret and checks exp
     jwt.verify(token, app.get('superSecret'), function(err, decoded) {     
     str = JSON.stringify(decoded);
-    console.log("test:" + decoded['rights']);
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
       } else if (decoded['rights'] < 4) {
@@ -84,8 +125,6 @@ apiRoutes.use(function(req, res, next) {
   }
 });
 
-
-
 // route to show a random message (GET http://localhost:8080/api/)
 /*apiRoutes.get('/', function(req, res) {
   res.json({ message: 'Welcome to the coolest API on earth!' });
@@ -96,7 +135,8 @@ apiRoutes.get('/userlist', function(req, res){
   User.find({}, function(err, users) {
     res.json(users);
   });
-});   
+});
+
 
 
 module.exports = apiRoutes;

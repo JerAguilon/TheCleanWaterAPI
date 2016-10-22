@@ -46,3 +46,5 @@ app.get('/setup',function(req, res) {
 var apiRoutes = require('./routes/userRoutes.js');
 app.use('/api/users', apiRoutes);
 
+var userReportRoutes = require('./routes/userReportRoutes.js');
+app.use('api/userreports', userReportRoutes);
