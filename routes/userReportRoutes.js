@@ -53,11 +53,10 @@ apiRoutes.use(function(req, res, next) {
 });
 
 apiRoutes.post('/submitreport', function(req, res) {
-	console.log(req.decoded);
 	var report = new UserReport({
 		'waterSourceType' : req.body.type,
 		'waterSourceCondition' : req.body.condition,
-		'reporterName' : req.body.reporterName,
+		'reporterName' : req.decoded.user.username,
 		'location' : req.body.location
 	});
 
@@ -82,6 +81,7 @@ apiRoutes.post('/submitreport', function(req, res) {
 });
 
 apiRoutes.get('/viewuserreports', function(req, res) {
+
 	UserReport.find({}, function(err, userReports) {
 		if (err) throw err;
 		res.json(userReports);	
