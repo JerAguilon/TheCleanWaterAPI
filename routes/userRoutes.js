@@ -131,7 +131,7 @@ apiRoutes.use(function(req, res, next) {
 });
 */
 // route to return all users (GET http://localhost:8080/api/users)
-apiRoutes.get('/userlist', function(req, res){ 
+apiRoutes.get('/viewusers', function(req, res){ 
   User.find({}, function(err, users) {
     res.json(users);
   });

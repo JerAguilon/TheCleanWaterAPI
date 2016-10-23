@@ -2,7 +2,7 @@
 var express = require('express');
 // get an instance of the router for api routes
 var apiRoutes = express.Router(); 
-var User = require('../app/models/user');
+var UserReport = require('../app/models/userreport');
 var jwt = require('jsonwebtoken');
 var app = express();
 var bodyParser = require('body-parser');
@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 app.set('superSecret', config.secret);
 
 
+apiRoutes.get("/", function(req, res) {
+	res.json({'success' : true});
+});
 
 // route middleware to verify a token, rights must be >= 0
 apiRoutes.use(function(req, res, next) {
@@ -50,7 +53,39 @@ apiRoutes.use(function(req, res, next) {
 });
 
 apiRoutes.post('/submitreport', function(req, res) {
+	console.log(req.decoded);
+	var report = new UserReport({
+		'waterSourceType' : req.body.type,
+		'waterSourceCondition' : req.body.condition,
+		'reporterName' : req.body.reporterName,
+		'location' : req.body.location
+	});
 
+	UserReport.findOne({'location' : req.body.location},
+		function(err, foundUserReport) {
+			if (!foundUserReport) {
+				report.save(function(err) {
+					if (err) throw err;
+				});	
+
+				res.json({
+					'success' : true,
+					'message' : 'User report added'		
+				});
+			} else {
+				res.json({
+					'success' : false,
+					'message' : 'User report already exists'
+				});
+			}
+		});	
+});
+
+apiRoutes.get('/viewuserreports', function(req, res) {
+	UserReport.find({}, function(err, userReports) {
+		if (err) throw err;
+		res.json(userReports);	
+	});	
 });
 
 module.exports = apiRoutes;

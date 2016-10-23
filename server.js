@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var mongoose = require('mongoose');
 var config = require('./config');
 var User = require('./app/models/user');
+var UserReport = require('./app/models/userreport')
 
 
 var port = process.env.PORT || 8080;
@@ -40,6 +41,19 @@ app.get('/setup',function(req, res) {
 	});
 
 	console.log('User saved successfully');
+
+	var userreport = new UserReport({
+		'waterSourceType' : 0,
+		'waterSourceCondition' : 0,
+		'reporterName' : 'TestReporter', 
+		'location' : '1256'	
+	});
+
+	userreport.save(function(err) {
+		if(err) throw err;
+	});
+
+	console.log('Report saved successfully');
 	res.json({success: true});
 });
 
@@ -47,4 +61,4 @@ var apiRoutes = require('./routes/userRoutes.js');
 app.use('/api/users', apiRoutes);
 
 var userReportRoutes = require('./routes/userReportRoutes.js');
-app.use('api/userreports', userReportRoutes);
+app.use('/api/userreports', userReportRoutes);
