@@ -52,10 +52,10 @@ apiRoutes.use(function(req, res, next) {
   }
 });
 
-apiRoutes.post('/submitreport', function(req, res) {
+apiRoutes.post('/submit', function(req, res) {
 	var report = new UserReport({
-		'waterSourceType' : req.body.type,
-		'waterSourceCondition' : req.body.condition,
+		'waterSourceType' : req.body.waterSourceType,
+		'waterSourceCondition' : req.body.waterSourceCondition,
 		'reporterName' : req.decoded.user.username,
 		'location' : req.body.location
 	});
@@ -80,7 +80,7 @@ apiRoutes.post('/submitreport', function(req, res) {
 		});	
 });
 
-apiRoutes.get('/viewuserreports', function(req, res) {
+apiRoutes.get('/view', function(req, res) {
 
 	UserReport.find({}, function(err, userReports) {
 		if (err) throw err;
