@@ -4,10 +4,10 @@ var Schema = mongoose.Schema;
 
 // set up a mongoose model and pass it using module.exports
 module.exports = mongoose.model('UserReport', new Schema({
-	'waterSourceType' : Number,
-	'waterSourceCondition' : Number,
-	'reporterName' : String,
-	'location' : String,
+	'waterSourceType' : {type: Number, required:true},
+	'waterSourceCondition' : {type:Number, required: true},
+	'reporterName' : {type: String, required: true},
+	'location' : {type: String, required: true},
 }, {
 	'timestamps' : true
 }));

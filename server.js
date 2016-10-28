@@ -62,3 +62,6 @@ app.use('/api/users', apiRoutes);
 
 var userReportRoutes = require('./routes/userReportRoutes.js');
 app.use('/api/userreports', userReportRoutes);
+
+var workerReportRoutes = require('./routes/workerReportRoutes.js');
+app.use('/api/workerreports', workerReportRoutes);

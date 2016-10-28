@@ -4,12 +4,12 @@ var Schema = mongoose.Schema;
 
 // set up a mongoose model and pass it using module.exports
 module.exports = mongoose.model('User', new Schema({
-	username: String,
-	password: String,
-	responsibility: Number,
+	username: {type:String, required:true},
+	password: {type:String, required:true},
+	responsibility: {type:Number, required:true},
 	profile:  {
-		email: String,
-		address: String,
-		title: String
+		email: {type:String, required:true},
+		address: {type:String, required:true},
+		title: {type:String, required:true}
 	}
 }));
