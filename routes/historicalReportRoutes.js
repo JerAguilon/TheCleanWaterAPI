@@ -32,7 +32,7 @@ apiRoutes.use(function(req, res, next) {
     str = JSON.stringify(decoded);
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else if (decoded['rights'] != 3) {
+      } else if (decoded['rights'] != 2) {
         return res.json({ success: false, message: 'Insuficcient rights to view this data.' });    
       } else {
         // if everything is good, save to request for use in other routes
@@ -56,10 +56,11 @@ apiRoutes.post('/submit', function(req, res) {
 	var report = new HistoricalReport({
 		'historicalReportType' : req.body.historicalReportType,
 		'ppm' : req.body.ppm,
-		'location' : req.body.location
+		'location' : req.body.location,
+    'date' : req.body.date
 	});
 
-	HistoricalReport.findOne({'location' : req.body.location},
+	HistoricalReport.findOne({'location' : req.body.location, 'date' : req.body.date},
 		function(err, foundUserReport) {
 			if (!foundUserReport) {
 				report.save(function(err) {
