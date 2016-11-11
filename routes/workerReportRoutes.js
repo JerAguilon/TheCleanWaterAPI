@@ -55,27 +55,24 @@ apiRoutes.post('/submit', function(req, res) {
 	var report = new WorkerReport({
 		'waterPurityCondition' : req.body.waterPurityCondition,
 		'reporterName' : req.decoded.user.username,
-		'location' : req.body.location
+		'location' : req.body.location,
+    'virusPPM' : req.body.virusPPM,
+    'contaminantPPM' : req.body.contaminantPPM
 	});
 
-	WorkerReport.findOne({'location' : req.body.location},
-		function(err, foundUserReport) {
-			if (!foundUserReport) {
-				report.save(function(err) {
-					if (err) throw err;
-				});	
+  report.save(function(err) {
+    if (err) {
+      res.json({
+        'success' : false,
+        'message' : 'failed to save report'
+      })
+    }
+  }); 
 
-				res.json({
-					'success' : true,
-					'message' : 'Worker report added'		
-				});
-			} else {
-				res.json({
-					'success' : false,
-					'message' : 'Worker report already exists'
-				});
-			}
-		});	
+  res.json({
+    'success' : true,
+    'message' : 'Worker report added'   
+  });
 });
 
 apiRoutes.get('/view', function(req, res) {
