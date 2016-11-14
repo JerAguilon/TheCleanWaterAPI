@@ -6,7 +6,8 @@ module.exports = mongoose.model('WorkerReport', new Schema({
 	'waterPurityCondition' : {type:Number, required: true},
 	'location' : {type:String, required: true},
 	'virusPPM' : {type:Number, required: true},
-	'contaminantPPM' : {type:Number, required: true}
+	'contaminantPPM' : {type:Number, required: true},
+	'date' : {type:Date, default: Date.now}
 }, {
 	'timestamps' : true
 }));

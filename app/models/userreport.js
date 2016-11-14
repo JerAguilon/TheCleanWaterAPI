@@ -8,6 +8,7 @@ module.exports = mongoose.model('UserReport', new Schema({
 	'waterSourceCondition' : {type:Number, required: true},
 	'reporterName' : {type: String, required: true},
 	'location' : {type: String, required: true},
+	'date' : {type: Date, default: Date.now}
 }, {
 	'timestamps' : true
 }));

@@ -57,7 +57,8 @@ apiRoutes.post('/submit', function(req, res) {
 		'reporterName' : req.decoded.user.username,
 		'location' : req.body.location,
     'virusPPM' : req.body.virusPPM,
-    'contaminantPPM' : req.body.contaminantPPM
+    'contaminantPPM' : req.body.contaminantPPM,
+    'date' : new Date(req.body.date)
 	});
 
   report.save(function(err) {
