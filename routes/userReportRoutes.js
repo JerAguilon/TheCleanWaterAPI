@@ -58,7 +58,7 @@ apiRoutes.post('/submit', function(req, res) {
 		'waterSourceCondition' : req.body.waterSourceCondition,
 		'reporterName' : req.decoded.user.username,
 		'location' : req.body.location,
-		'date' : new Date('req.body.date')
+		'date' : new Date(req.body.date)
 	});
 
 	UserReport.findOne({'location' : req.body.location},
