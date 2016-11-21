@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 app.get('/', function(req, res) {
-	res.send('API Location: http://localhost:' + port + '/api');
+	res.sendFile(__dirname + '/views/index.html');
 });
 
 app.listen(port);
