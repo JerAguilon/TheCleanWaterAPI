@@ -16,9 +16,13 @@ app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
 app.use(morgan('dev'));
+app.use('/css', express.static(__dirname + '/public/css'));;
+app.use('/scripts', express.static(__dirname + '/public/scripts'));;
+app.use('/views', express.static(__dirname + '/public/views'));;
+
 
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/views/index.html');
+	res.sendFile(__dirname + '/public/index.html');
 });
 
 app.listen(port);
