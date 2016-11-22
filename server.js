@@ -29,6 +29,10 @@ app.get('/home', function(req, res) {
 	res.sendFile(__dirname + '/public/home.html');
 });
 
+app.get('/profile', function(req, res) {
+	res.sendFile(__dirname + '/public/profile.html');
+});
+
 app.listen(port);
 console.log('Access link: http://localhost:' + port);
 
