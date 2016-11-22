@@ -4,19 +4,83 @@ myApp.controller('LoginController', function ($scope, $http, $window) {
   $scope.user = $scope.form;
   $scope.message = '';
   $scope.submitLogin = function (form) {
-    $http
-      .post('api/users/authenticate', $scope.user)
-      .success(function (data, status, headers, config) {
-        $window.sessionStorage.token = data.token;
-        $scope.message = 'Welcome';
-      })
-      .error(function (data, status, headers, config) {
-        // Erase the token if the user fails to log in
-        delete $window.sessionStorage.token;
+    if (form.$name == 'loginForm') {
+        $scope.user = {
+            'username' : $scope.username,
+            'password' : $scope.password
+        }
+        $http.post('api/users/authenticate', $scope.user)
+          .success(function (data, status, headers, config) {
+            if (data.success) {
+                $window.sessionStorage.token = data.token;
 
-        // Handle login errors here
-        $scope.message = 'Error: Invalid user or password';
-      });
+                var url = "http://" + $window.location.host + "/home";
+                $window.location.href = url;
+
+            } else {
+                alert(data.message);
+            }
+
+          })
+          .error(function (data, status, headers, config) {
+            // Erase the token if the user fails to log in
+            delete $window.sessionStorage.token;
+
+            // Handle login errors here
+            $scope.message = 'Error: Invalid user or password';
+            });        
+    } else {
+        if ($scope.password != $scope.confirmPassword) {
+            alert("Please ensure passwords match");
+            return;
+        }
+
+        $scope.user = {
+            'username' : $scope.username,
+            'password' : $scope.password,
+            'address' : $scope.address,
+            'title' : $scope.title,
+            'responsibility' : $scope.authorization
+        }
+        $http
+          .post('api/users/addUser', $scope.user)
+          .success(function (data, status, headers, config) {
+            if (data.success) {
+                alert(data.message);
+                $http.post('api/users/authenticate', $scope.user)
+                  .success(function (data, status, headers, config) {
+                    if (data.success) {
+                        $window.sessionStorage.token = data.token;
+
+                        var url = "http://" + $window.location.host + "/home";
+                        $window.location.href = url;
+
+                    } else {
+                        alert(data.message);
+                    }
+
+                  })
+                  .error(function (data, status, headers, config) {
+                    // Erase the token if the user fails to log in
+                    delete $window.sessionStorage.token;
+
+                    // Handle login errors here
+                    $scope.message = 'Error: Invalid user or password';
+                    });   
+            } else {
+                alert(data.message);
+            }
+
+          })
+          .error(function (data, status, headers, config) {
+            // Erase the token if the user fails to log in
+            delete $window.sessionStorage.token;
+            alert("failed to add user: " + data.message);
+            // Handle login errors here
+          });       
+    } 
+
+
   };
 });
 /*$(function() {
