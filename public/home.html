@@ -3,7 +3,7 @@
 
 <!-- Where all the magic happens -->
 <!-- LOGIN FORM -->
-<html>
+<html ng-app='myApp'>
 	<head>
 		<!-- All the files that are required -->
 		<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -11,13 +11,137 @@
 		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/jquery.validate.min.js"></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+
 		<!-- Optional Bootstrap theme -->
 	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 	 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
 	
-		<link rel="stylesheet" type="text/css" href="css/index.css" />
 		<script src="/scripts/home.js"></script>
 	</head>
 
-	<body><p id="foo"></p></body>
+	<body>
+		
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#">The Clean Water Project</a>
+		    </div>
+		    <ul class="nav navbar-nav">
+		      <li class="active"><a href="#">Home</a></li>
+		      <li><a href="#">Profile</a></li>
+		    </ul>
+		  </div>
+		</nav>
+
+		<div class="container" ng-controller="TableController">
+		  <h2>User Reports</h2>
+		  <p>Standard water reports are submitted by everyday users and displayed here</p>
+		  <div class="table-responsive">
+		  <table class="table">
+			<thead>
+		        <th>Date</th>
+		        <th>Reporter</th>
+		        <th>Location</th>
+		        <th>Water Source Type</th>
+		        <th>Water Source Condition</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="x in userReports">
+					<td>{{x.date}}</td>
+					<td>{{x.reporterName}}</td>
+					<td>{{x.location}}</td>
+					<td>{{x.waterSourceType}}</td>
+					<td>{{x.waterSourceCondition}}</td>
+				</tr>						
+			</tbody>	
+		  </table>
+		  </div>
+		  <div class="row">
+		  	<button type="button" class="btn btn-primary btn-sm" ng-click="status.userReport = !status.userReport">Submit a user report</button>
+		  </div>
+		  <div class="row" ng-show="status.userReport">
+			<form name="userReportForm">
+				<div class="form-group">
+					<input type="text" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
+				</div>
+				<div class="form-group">
+					<input type="text" data-ng-model="location" tabindex="2" class="form-control" placeholder="Location">
+				</div>
+				<div class="form-group">
+					<select class="form-control" id="waterSourceType" data-ng-model="waterSourceType">
+					    <option value="0" selected="selected">Bottled</option>
+					    <option value="1">Well</option>
+					    <option value="2">Lake</option>
+					    <option value="3">Other</option>
+					 </select> 										
+				</div>
+				<div class="form-group">
+					<select class="form-control" id="waterSourceCondition" data-ng-model="waterSourceCondition">
+					    <option value=0 selected>Waste</option>
+					    <option value=1>Clear (Treatable)</option>
+					    <option value=2>Muddy (Treatable)</option>
+					    <option value=3>Potable</option>
+					 </select> 										
+				</div>
+			</form>
+		  </div>
+
+		</div>
+
+		<div class="container" ng-controller="TableController">
+		  <h2>Worker Reports</h2>
+		  <p>More specific purity reports are submitted by worker and displayed here</p>
+		  <div class="table-responsive">
+		  <table class="table">
+			<thead>
+		        <th>Date</th>
+		        <th>Reporter</th>
+		        <th>Location</th>
+		        <th>Water Purity Condition</th>
+		        <th>Virus PPM</th>
+		        <th>Contaminant PPM</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="x in workerReports">
+					<td>{{x.date}}</td>
+					<td>{{x.reporterName}}</td>
+					<td>{{x.location}}</td>
+					<td>{{x.waterPurityCondition}}</td>
+					<td>{{x.virusPPM}}</td>
+					<td>{{x.contaminantPPM}}</td>
+				</tr>						
+			</tbody>	
+		  </table>
+		  </div>
+  		  <button type="button" class="btn btn-primary btn-sm" ng-click="status.workerReport = !status.workerReport">Submit a worker report</button>
+		  <div ng-show="status.workerReport">
+			<form name="workerReportForm">
+				<div class="form-group">
+					<input type="text" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
+				</div>
+				<div class="form-group">
+					<input type="text" data-ng-model="location" tabindex="2" class="form-control" placeholder="Location">
+				</div>
+				<div class="form-group">
+					<select class="form-control" id="waterPurityCondition" data-ng-model="waterPurityCondition">
+					    <option value="0" selected> Safe</option>
+					    <option value="1">Treatable</option>
+					    <option value="2">Unsafe</option>
+					 </select> 										
+				</div>
+				<div class="form-group">
+					<input type="text" data-ng-model="virusPPM" tabindex="3" class="form-control" placeholder="Virus PPM">
+				</div>
+				<div class="form-group">
+					<input type="text" data-ng-model="contaminantPPM" tabindex="4" class="form-control" placeholder="Contaminant PPM">
+				</div>
+			</form>
+		  </div>
+		</div>
+  		
+
+
+
+	</body>
 </html>
