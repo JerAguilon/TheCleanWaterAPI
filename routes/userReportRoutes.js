@@ -23,7 +23,7 @@ apiRoutes.use(function(req, res, next) {
 
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
+  console.log(req.body);
   // decode token
   if (token) {
 
@@ -36,7 +36,7 @@ apiRoutes.use(function(req, res, next) {
         return res.json({ success: false, message: 'Insuficcient rights to view this data.' });    
       } else {
         // if everything is good, save to request for use in other routes
-        req.decoded = decoded;    
+        req.decoded = decoded; 
         next();
       }
     });
@@ -53,6 +53,10 @@ apiRoutes.use(function(req, res, next) {
 });
 
 apiRoutes.post('/submit', function(req, res) {
+	if (!req.body.reporterName) {
+		req.body.reporterName = req.decoded.username;
+	}
+
 	var report = new UserReport({
 		'waterSourceType' : req.body.waterSourceType,
 		'waterSourceCondition' : req.body.waterSourceCondition,

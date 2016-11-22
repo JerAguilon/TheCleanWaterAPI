@@ -63,14 +63,15 @@
 		  <div class="row" ng-show="status.userReport">
 			<form name="userReportForm">
 				<div class="form-group">
-					<input type="text" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
+					<input type="date" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
 				</div>
 				<div class="form-group">
 					<input type="text" data-ng-model="location" tabindex="2" class="form-control" placeholder="Location">
 				</div>
 				<div class="form-group">
 					<select class="form-control" id="waterSourceType" data-ng-model="waterSourceType">
-					    <option value="0" selected="selected">Bottled</option>
+						<option selected disabled>Water Source Type</option>
+					    <option value="0">Bottled</option>
 					    <option value="1">Well</option>
 					    <option value="2">Lake</option>
 					    <option value="3">Other</option>
@@ -78,11 +79,19 @@
 				</div>
 				<div class="form-group">
 					<select class="form-control" id="waterSourceCondition" data-ng-model="waterSourceCondition">
-					    <option value=0 selected>Waste</option>
+						<option selected disabled>Water Source Condition</option>
+					    <option value=0>Waste</option>
 					    <option value=1>Clear (Treatable)</option>
 					    <option value=2>Muddy (Treatable)</option>
 					    <option value=3>Potable</option>
 					 </select> 										
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-sm-6 col-sm-offset-3">
+						<button data-ng-disabled="progress.active()" data-ng-click="submitReport(userReportForm)" class="btn btn-primary">Register</button>
+						</div>
+					</div>
 				</div>
 			</form>
 		  </div>
@@ -118,13 +127,14 @@
 		  <div ng-show="status.workerReport">
 			<form name="workerReportForm">
 				<div class="form-group">
-					<input type="text" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
+					<input type="date" data-ng-model="date" tabindex="1" class="form-control" placeholder="Date" value="">
 				</div>
 				<div class="form-group">
 					<input type="text" data-ng-model="location" tabindex="2" class="form-control" placeholder="Location">
 				</div>
 				<div class="form-group">
 					<select class="form-control" id="waterPurityCondition" data-ng-model="waterPurityCondition">
+						<option selected disabled>Water Purity Condition</option>
 					    <option value="0" selected> Safe</option>
 					    <option value="1">Treatable</option>
 					    <option value="2">Unsafe</option>
@@ -135,6 +145,13 @@
 				</div>
 				<div class="form-group">
 					<input type="text" data-ng-model="contaminantPPM" tabindex="4" class="form-control" placeholder="Contaminant PPM">
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-sm-6 col-sm-offset-3">
+						<button data-ng-disabled="progress.active()" data-ng-click="submitReport(workerReportForm)" class="btn btn-primary">Register</button>
+						</div>
+					</div>
 				</div>
 			</form>
 		  </div>
