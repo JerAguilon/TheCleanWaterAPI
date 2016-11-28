@@ -19,6 +19,7 @@ app.use(morgan('dev'));
 app.use('/css', express.static(__dirname + '/public/css'));;
 app.use('/scripts', express.static(__dirname + '/public/scripts'));;
 app.use('/views', express.static(__dirname + '/public/views'));;
+app.use('/images', express.static(__dirname + '/public/images'));;
 
 
 app.get('/', function(req, res) {
