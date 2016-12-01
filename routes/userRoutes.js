@@ -141,13 +141,34 @@ apiRoutes.get('/me', function(req, res){
 });
 
 apiRoutes.post('/me/update', function(req, res) {
-  var userID = req.decoded['_id'];
+  var userID = req.decoded.user['_id'];
 
-  var updateFields = {};
-  //TODO: Get request values
-  var user = User.findAndModify({"_id" : userID},
-    {//TODO: Update fields here}
-  );
+  console.log(userID);
+
+  User.findById(userID, function(err, user) {
+    if (err) throw err;
+
+    console.log(user);
+    if (req.body.email) {
+      user.profile.email = req.body.email;
+    }
+
+    if (req.body.address) {
+      user.profile.address = req.body.address;
+    }
+
+    if (req.body.title) {
+      user.profile.title = req.body.title;
+    }
+
+    user.save(function(err) {
+      if (err) throw err;
+      console.log('Saved user');
+      return res.json({success: true, message: 'User saved'})
+    })
+
+  })
+     
 
 
 });
