@@ -131,13 +131,25 @@ apiRoutes.use(function(req, res, next) {
 */
 // route to return all users (GET http://localhost:8080/api/users)
 apiRoutes.get('/me', function(req, res){ 
-  User.findOne({'username' : req.headers['username']}, function(err, user) {
+  User.findOne(req.decoded['username'], function(err, user) {
     if (!user) {
       return res.json({success: false, message : 'Failed to get your user data'});
     } else {
       return res.json({success: true, message : 'User found', userData : user})
     }
   });
+});
+
+apiRoutes.post('/me/update', function(req, res) {
+  var userID = req.decoded['_id'];
+
+  var updateFields = {};
+  //TODO: Get request values
+  var user = User.findAndModify({"_id" : userID},
+    {//TODO: Update fields here}
+  );
+
+
 });
 
 
