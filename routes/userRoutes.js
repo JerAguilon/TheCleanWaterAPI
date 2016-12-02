@@ -142,13 +142,10 @@ apiRoutes.get('/me', function(req, res){
 
 apiRoutes.post('/me/update', function(req, res) {
   var userID = req.decoded.user['_id'];
-
-  console.log(userID);
-
+  console.log(req.body);
   User.findById(userID, function(err, user) {
     if (err) throw err;
 
-    console.log(user);
     if (req.body.email) {
       user.profile.email = req.body.email;
     }
