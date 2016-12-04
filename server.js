@@ -80,6 +80,9 @@ app.use('/api/userreports', userReportRoutes);
 var workerReportRoutes = require('./routes/workerReportRoutes.js');
 app.use('/api/workerreports', workerReportRoutes);
 
+var adminRoutes = require('./routes/adminRoutes.js');
+app.use('/api/admin', adminRoutes);
+
 // DEPRECATED ROUTE
 //var historicalReportRoutes = require('./routes/historicalReportRoutes.js');
 //app.use('/api/historicalreports', historicalReportRoutes);
