@@ -81,10 +81,27 @@ apiRoutes.post('/submit', function(req, res) {
 
 apiRoutes.get('/view', function(req, res) {
 
-  WorkerReport.find({}, function(err, userReports) {
+  WorkerReport.find({}, function(err, workerReports) {
     if (err) throw err;
-    res.json(userReports);  
+    res.json(workerReports);  
   }); 
+});
+
+apiRoutes.get('/view/location/:location/year/:year', function(req, res) {
+  if (isNaN(req.params.year)) {
+    return res.json({ 
+        success: false, 
+        message: 'invalid year format'
+    });
+  }
+
+  var query = "1/1/" + req.params.year.toString();
+  var nextQuery = "1/1/" + (parseInt(req.params.year) + 1).toString();
+
+  WorkerReport.find({"location": req.params.location, "date" : {"$gte":new Date(query), "$lt":new Date(nextQuery)}}, function(err, workerReports) {
+    if (err) throw err;
+    res.json(workerReports);
+  })
 });
 
 module.exports = apiRoutes;

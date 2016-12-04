@@ -1,30 +1,62 @@
-var myApp = angular.module('myApp', ['ngMap', 'angularCharts']);
+var myApp = angular.module('myApp', ['ngMap', 'chart.js']);
 
-myApp.service('sharedInfo', function($http, $window) {
-	function loadData() {
-		if (!$window.sessionStorage.token) {
+myApp.run(function($http, $window) {
+		if (!$window.sessionStorage.token || window.sessionStorage.token === 'undefined') {
 			var url = "http://" + $window.location.host + "/";
             $window.location.href = url;
-		}
-	}
+        }
 
-	loadData();
 });
 
-myApp.controller('TableController', function ($scope, $http, $window, sharedInfo) {
-	function getUserReports() {
-		$http.get("api/userreports/view", {headers : {'x-access-token' : $window.sessionStorage.token}
+myApp.factory('sharedInfo', function($http, $window) {
+	var getMe = function() {
+		return $http.get("api/users/me", {headers : {'x-access-token' : $window.sessionStorage.token}
 		}).then(function (response) {
-			$scope.userReports = response.data; 
-		});		
-	}
-	function getWorkerReports() {
-		$http.get("api/workerReports/view", {headers : {'x-access-token' : $window.sessionStorage.token}
-		}).then(function (response) {
-			$scope.workerReports = response.data;
-		});		
+			return response;
+		});				
 	}
 
+	var getUserReports = function() {
+		return $http.get("api/userreports/view", {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			return response; 
+		});				
+	}
+
+	var getWorkerReports = function() {
+		return $http.get("api/workerReports/view", {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			return response;
+		});	
+	}
+
+	var getWorkerReportsByYear = function(location, year) {
+		var query = "api/workerReports/view/location/" + location + "/year/" + year;
+
+		return $http.get(query, {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			return response;
+		});	
+	}
+
+	return {
+		getWorkerReports: getWorkerReports,
+		getUserReports: getUserReports,
+		getMe: getMe,
+		getWorkerReportsByYear : getWorkerReportsByYear
+	}
+
+
+});
+
+
+myApp.controller('TableController', function ($scope, $http, $window, sharedInfo) {
+	sharedInfo.getUserReports().then(function(result) {
+		$scope.userReports = result.data;
+	});
+	sharedInfo.getWorkerReports().then(function(result) {
+		$scope.workerReports = result.data;
+	});
 	$scope.submitReport = function (form) {
 		if (form.$name == 'userReportForm') {
 		    $scope.report = {
@@ -38,7 +70,6 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 		      .success(function (data, status, headers, config) {
 		        if (data.success) {
 		        	alert('Submitted successfully');
-		        	getUserReports();
 		        } else {
 		            alert(data.message);
 		        }
@@ -60,7 +91,6 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 		      .success(function (data, status, headers, config) {
 		        if (data.success) {
 		        	alert('Submitted successfully');
-		        	getWorkerReports();
 		        } else {
 		            alert(data.message);
 		        }
@@ -74,20 +104,13 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 
 	};
 
-	$scope.init = function() {
-		getUserReports();
-		getWorkerReports();
-    };
-		
 
-    $scope.init();
 
 });
 
-myApp.controller('UserController', function ($scope, $http, $window) {
+myApp.controller('UserController', function ($scope, $http, $window, sharedInfo) {
 	function getProfileInfo() {
-		$http.get("api/users/me", {headers : {'x-access-token' : $window.sessionStorage.token}
-		}).then(function (response) {
+		sharedInfo.getMe().then(function(response) {
 			if (response.data.userData.responsibility == 0) $scope.role = "User";
 			else if (response.data.userData.responsibility == 1) $scope.role = "Worker";
 			else if (response.data.userData.responsibility == 2) $scope.role = "Manager";
@@ -131,17 +154,22 @@ myApp.controller('UserController', function ($scope, $http, $window) {
 	       		alert(data.message); 
 	      	});        			
 	}
+	$scope.logoff = function() {
+		$window.sessionStorage.token = null;
+		var url = "http://" + $window.location.host + "/";
+        $window.location.href = url;
+
+	}
 
 	$scope.init();
 });
 
 
-myApp.controller('mapController', function($http, $interval, $window, NgMap) {
+myApp.controller('mapController', function($http, $scope, $interval, $window, NgMap, sharedInfo) {
   	var vm = this;
 
 
-	$http.get("api/userreports/view", {headers : {'x-access-token' : $window.sessionStorage.token}
-	}).then(function (response) {
+	sharedInfo.getUserReports().then(function (response) {
   		vm.positions = [];
 
 	  	var foundData = {userReports:[]};
@@ -174,6 +202,108 @@ myApp.controller('mapController', function($http, $interval, $window, NgMap) {
 
 	});
 
+	$scope.showData = function(obj) {
+		var output = "Location: " + this.latitude + ", " + this.longitude + "\n" + 
+				"Reporter: " + this.reporter + 
+				"\nCondition: " + this.condition +
+				"\nType: " + this.type;
+		alert(output);
+	}
+});
+
+myApp.controller("chartController", function ($scope, sharedInfo) {
+  $scope.shouldShow = false;
+
+
+  sharedInfo.getMe().then(function(response) {
+  	if (response.data.userData.responsibility > 1) {
+  		$scope.shouldShow = true;
+  	} else {
+  		$scope.shouldShow = false;
+  		return;
+  	}
+  });
+
+
+  $scope.location = "1,1";
+  $scope.year = "1997"
+  $scope.updateChart = function() {
+	  sharedInfo.getWorkerReportsByYear($scope.location, $scope.year).then(function(response) {
+
+	  	  $scope.data = [[0, 0, 0, 0,0, 0, 0, 0,0, 0, 0, 0], 
+	  				 [0, 0, 0, 0,0, 0, 0, 0,0, 0, 0, 0]];
+	  	  var responseData = response.data;
+
+		  var dateToVirusPPM = {}
+		  var dateToContaminantPPM = {}
+	  	  for (i = 0; i < responseData.length; i++) {
+	  	  	var item = responseData[i];
+	  	  	var month = new Date(item.date).getMonth();
+	  	  	dateToVirusPPM[month] = item.virusPPM;
+	  	  	dateToContaminantPPM[month] = item.contaminantPPM;
+
+	  	  }
+
+		  for (month in dateToVirusPPM) {
+		  	$scope.data[0][parseInt(month)] = dateToVirusPPM[month];
+		  }
+		  for (month in dateToContaminantPPM) {
+		  	$scope.data[1][parseInt(month)] = dateToContaminantPPM[month];
+		  }
+
+		  console.log($scope.data);
+	  });
+
+  }
+
+
+
+
+  $scope.labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  $scope.series = ['virusPPM', 'contaminantPPM'];
+
+
+  $scope.onClick = function (points, evt) {
+    console.log(points, evt);
+  };
+  $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];
+  $scope.options = {
+    scales: {
+      yAxes: [
+        {
+          id: 'y-axis-1',
+          type: 'linear',
+          display: true,
+          position: 'left'
+        },
+        {
+          id: 'y-axis-2',
+          type: 'linear',
+          display: true,
+          position: 'right'
+        }
+      ]
+    }
+  };
+
+  $scope.init = function() {
+  	$scope.updateChart();
+  }
+
+  $scope.init();
+});
+
+myApp.controller('NavbarController', function ($scope, $http, $window, sharedInfo) {
+	$scope.isManager = false;
+
+	  sharedInfo.getMe().then(function(response) {
+	  	if (response.data.userData.responsibility > 2) {
+	  		$scope.isManager = true;
+	  	} else {
+	  		$scope.isManager = false;
+	  		return;
+	  	}
+	  });
 
 
 });

@@ -1,6 +1,16 @@
 var myApp = angular.module('myApp', []);
 
+myApp.run(function($http, $window) {
+        if ($window.sessionStorage.token && $window.sessionStorage.token != null &&
+                $window.sessionStorage.token != "" && $window.sessionStorage.token !== "undefined") {
+            var url = "http://" + $window.location.host + "/home";
+            $window.location.href = url;
+        }
+});
+
 myApp.controller('LoginController', function ($scope, $http, $window) {
+
+
   $scope.user = $scope.form;
   $scope.message = '';
   $scope.submitLogin = function (form) {
