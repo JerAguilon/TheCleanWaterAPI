@@ -39,6 +39,10 @@ app.get('/admin', function (req, res) {
 	res.sendFile(__dirname + '/public/admin.html');
 })
 
+app.get('/manager', function (req, res) {
+	res.sendFile(__dirname + '/public/manager.html');	
+});
+
 app.listen(port);
 console.log('Access link: http://localhost:' + port);
 
@@ -86,6 +90,9 @@ app.use('/api/workerreports', workerReportRoutes);
 
 var adminRoutes = require('./routes/adminRoutes.js');
 app.use('/api/admin', adminRoutes);
+
+var managerRoutes = require('./routes/managerRoutes.js');
+app.use('/api/manager', managerRoutes)
 
 // DEPRECATED ROUTE
 //var historicalReportRoutes = require('./routes/historicalReportRoutes.js');
