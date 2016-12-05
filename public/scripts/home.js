@@ -1,11 +1,12 @@
 var myApp = angular.module('myApp', ['ngMap', 'chart.js']);
 
 myApp.run(function($http, $window) {
-		if (!$window.sessionStorage.token || window.sessionStorage.token === 'undefined') {
+		if ($window.sessionStorage.token === 'null' || !$window.sessionStorage.token || $window.sessionStorage.token === 'undefined' || $window.sessionStorage.token == '') {
 			var url = "http://" + $window.location.host + "/";
             $window.location.href = url;
         }
 
+        console.log($window.sessionStorage);
 });
 
 myApp.factory('sharedInfo', function($http, $window) {
@@ -64,7 +65,7 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 		        'location' : $scope.location,
 		        'waterSourceType' : $scope.waterSourceType,
 		        'waterSourceCondition' : $scope.waterSourceCondition,
-		        'token' : token
+		        'token' : $window.sessionStorage.token
 		    }
 		    $http.post('api/userreports/submit', JSON.stringify($scope.report))
 		      .success(function (data, status, headers, config) {
@@ -85,7 +86,7 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 		        'waterPurityCondition' : $scope.waterPurityCondition,
 		        'virusPPM' : $scope.virusPPM,
 		        'contaminantPPM' : $scope.contaminantPPM,
-		        'token' : token
+		        'token' : $window.sessionStorage.token
 		    }
 		    $http.post('api/workerreports/submit', JSON.stringify($scope.report))
 		      .success(function (data, status, headers, config) {

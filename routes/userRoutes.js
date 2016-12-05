@@ -17,7 +17,6 @@ app.set('superSecret', config.secret);
 
 
 apiRoutes.post('/authenticate', function(req, res) {
-
   // find the user
   User.findOne({
     username: req.body.username
@@ -29,15 +28,30 @@ apiRoutes.post('/authenticate', function(req, res) {
       res.json({ success: false, message: 'Authentication failed. User not found.' });
     } else if (user) {
 
+      if (user.attempts == 3) {
+        return res.json({success: false, message: 'User is blocked. contact an admin to remedy this.'});
+      }
       // check if password matches
       if (user.password != req.body.password) {
         res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        user.attempts = user.attempts + 1;
+        user.save(function(err) {if (err) throw err;});
       } else {
         // if user is found and password is right
         // create a token
-        var token = jwt.sign({'user' : { '_id' : user._id,  'username' : user.username, 'responsibility' : user.responsibility}, 'rights':user.responsibility}, app.get('superSecret'), {
+        var token = jwt.sign({
+          'user' : {
+             '_id' : user._id,  
+             'username' : user.username, 
+             'responsibility' : user.responsibility,
+             'isBanned' : user.banned
+              },
+              'rights':user.responsibility}, app.get('superSecret'), {
           //expiresIn: 1440, // expires in 24 hours,
         });
+
+        user.attempts = 0;
+        user.save(function(err) {if (err) throw err;});
 
         // return the information including token as JSON
         res.json({
@@ -131,7 +145,7 @@ apiRoutes.use(function(req, res, next) {
 */
 // route to return all users (GET http://localhost:8080/api/users)
 apiRoutes.get('/me', function(req, res){ 
-  User.findOne(req.decoded['username'], function(err, user) {
+  User.findOne({'username' : req.decoded['user']['username']}, function(err, user) {
     if (!user) {
       return res.json({success: false, message : 'Failed to get your user data'});
     } else {

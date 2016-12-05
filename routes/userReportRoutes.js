@@ -57,6 +57,10 @@ apiRoutes.post('/submit', function(req, res) {
 		req.body.reporterName = req.decoded.username;
 	}
 
+	if (req.decoded.user.isBanned == true) {
+      return res.json({ success: false, message: 'User is banned.' });    
+	}
+
 	var report = new UserReport({
 		'waterSourceType' : req.body.waterSourceType,
 		'waterSourceCondition' : req.body.waterSourceCondition,

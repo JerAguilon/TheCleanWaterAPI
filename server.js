@@ -35,6 +35,10 @@ app.get('/profile', function(req, res) {
 	res.sendFile(__dirname + '/public/profile.html');
 });
 
+app.get('/admin', function (req, res) {
+	res.sendFile(__dirname + '/public/admin.html');
+})
+
 app.listen(port);
 console.log('Access link: http://localhost:' + port);
 

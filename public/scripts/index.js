@@ -1,7 +1,7 @@
 var myApp = angular.module('myApp', []);
 
 myApp.run(function($http, $window) {
-        if ($window.sessionStorage.token && $window.sessionStorage.token != null &&
+        if ($window.sessionStorage.token !== 'null' && $window.sessionStorage.token != null &&
                 $window.sessionStorage.token != "" && $window.sessionStorage.token !== "undefined") {
             var url = "http://" + $window.location.host + "/home";
             $window.location.href = url;
