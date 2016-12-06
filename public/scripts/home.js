@@ -54,9 +54,56 @@ myApp.factory('sharedInfo', function($http, $window) {
 myApp.controller('TableController', function ($scope, $http, $window, sharedInfo) {
 	sharedInfo.getUserReports().then(function(result) {
 		$scope.userReports = result.data;
+
+
+		for (i = 0; i < $scope.userReports.length; i++) {
+
+			var item = $scope.userReports[i];
+			var date = new Date(item.date);
+
+			item.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+
+			if (item.waterSourceType == 0) {
+				item.waterSourceType = "Bottled";
+			} else if (item.waterSourceType == 1) {
+				item.waterSourceType = "Well";
+			} else if (item.waterSourceType == 2) {
+				item.waterSourceType = "Lake";
+			} else if (item.waterSourceType == 3) {
+				item.waterSourceType = "Other";
+			}
+
+			if (item.waterSourceCondition == 0) {
+				item.waterSourceCondition = "Waste";
+			} else if (item.waterSourceCondition == 1) {
+				item.waterSourceCondition = "Clear (Treatable)";
+			} else if (item.waterSourceCondition == 2) {
+				item.waterSourceCondition = "Muddy (Treatable)";
+			} else if (item.waterSourceCondition == 3) {
+				item.waterSourceCondition = "Other";
+			}
+		}
 	});
 	sharedInfo.getWorkerReports().then(function(result) {
 		$scope.workerReports = result.data;
+
+		for (i = 0; i < $scope.workerReports.length; i++) {
+
+			var item = $scope.workerReports[i];
+			var date = new Date(item.date);
+
+			item.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+
+			if (item.waterPurityCondition == 0) {
+				item.waterPurityCondition = "Safe";
+			} else if (item.waterPurityCondition == 1) {
+				item.waterPurityCondition = "Treatable";
+			} else if (item.waterPurityCondition == 2) {
+				item.waterPurityCondition = "Unsafe";
+			}
+
+			
+		}
 	});
 	$scope.submitReport = function (form) {
 		if (form.$name == 'userReportForm') {
@@ -189,6 +236,31 @@ myApp.controller('mapController', function($http, $scope, $interval, $window, Ng
 
 			if (isNaN(x) || isNaN(y)) {
 				continue;
+			}
+
+			var item = foundData.userReports[i];
+			var date = new Date(item.date);
+
+			item.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+
+			if (item.waterSourceType == 0) {
+				item.waterSourceType = "Bottled";
+			} else if (item.waterSourceType == 1) {
+				item.waterSourceType = "Well";
+			} else if (item.waterSourceType == 2) {
+				item.waterSourceType = "Lake";
+			} else if (item.waterSourceType == 3) {
+				item.waterSourceType = "Other";
+			}
+
+			if (item.waterSourceCondition == 0) {
+				item.waterSourceCondition = "Waste";
+			} else if (item.waterSourceCondition == 1) {
+				item.waterSourceCondition = "Clear (Treatable)";
+			} else if (item.waterSourceCondition == 2) {
+				item.waterSourceCondition = "Muddy (Treatable)";
+			} else if (item.waterSourceCondition == 3) {
+				item.waterSourceCondition = "Other";
 			}
 
 			vm.positions.push({pos:[x, y],

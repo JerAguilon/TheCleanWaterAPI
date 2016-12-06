@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 // set up a mongoose model and pass it using module.exports
 module.exports = mongoose.model('User', new Schema({
-	attempts : {type:Number, default: 0},
+	attempts : {type:Number, required: true, default: 0},
 	username: {type:String, required:true},
 	password: {type:String, required:true},
 	responsibility: {type:Number, required:true},
@@ -13,7 +13,7 @@ module.exports = mongoose.model('User', new Schema({
 		address: {type:String, required:true},
 		title: {type:String, required:true}
 	},
-	banned: {type: Boolean, default: false}
+	banned: {type: Boolean, required: true, default: false}
 	},  
 	{
 		timestamps: true

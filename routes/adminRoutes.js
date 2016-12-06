@@ -8,6 +8,7 @@ var UserReport = require('../app/models/userreport');
 var jwt = require('jsonwebtoken');
 var app = express();
 var bodyParser = require('body-parser');
+var SecurityLog = require('../app/models/securityLog');
 
 var config = require('../config');
 
@@ -78,11 +79,29 @@ apiRoutes.get('/users/view', function(req, res) {
     }); 
 });
 
+apiRoutes.get('/securityLog/view', function(req, res) {
+  SecurityLog.find({}, function(err, log) {
+    if (err) throw err;
+    res.json(log);
+  })
+});
+
 
 apiRoutes.post('/users/deleteUser/:id', function(req, res) {
     User.remove({'_id':req.params.id}, function(err) {
       if (err) throw err;
-      console.log("FOO")
+      var securityLog = new SecurityLog({
+        type: 1
+      });
+
+      data = {
+        adminID: req.decoded['user']['_id'],
+        userID : req.params.id
+      };
+
+      securityLog.action = JSON.stringify(data);
+      securityLog.save(function(err) {if (err) throw err});
+
 
       return res.json({success: true, message: 'User deleted successfully'})
     });
@@ -97,6 +116,19 @@ apiRoutes.post('/users/toggleBan/:id', function(req, res) {
       user.banned = true;
     }
 
+    var securityLog = new SecurityLog({
+      type: 2
+    });
+
+    data = {
+      adminID: req.decoded['user']['_id'],
+      userID : req.params.id,
+      isBanned : user.banned
+    };
+
+    securityLog.action = JSON.stringify(data);
+    securityLog.save(function(err) {if (err) throw err});
+
     user.save(function(err) { if (err) throw err;});
 
     return res.json({success: true, message: 'User updated'});
@@ -110,6 +142,18 @@ apiRoutes.post('/users/toggleBlock/:id', function(req, res) {
     } else {
       user.attempts = 3;
     }
+    var securityLog = new SecurityLog({
+      type: 3
+    });
+
+    data = {
+      adminID: req.decoded['user']['_id'],
+      userID : req.params.id,
+      isBlocked : (user.attempt == 3 ? true : false)
+    };
+
+    securityLog.action = JSON.stringify(data);
+    securityLog.save(function(err) {if (err) throw err});
 
     user.save(function(err) { if (err) throw err;});
 

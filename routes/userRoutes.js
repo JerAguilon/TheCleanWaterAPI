@@ -6,15 +6,12 @@ var User = require('../app/models/user');
 var jwt = require('jsonwebtoken');
 var app = express();
 var bodyParser = require('body-parser');
-
+var SecurityLog = require('../app/models/securityLog');
 var config = require('../config');
 
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 app.set('superSecret', config.secret);
-
-
-
 
 apiRoutes.post('/authenticate', function(req, res) {
   // find the user
@@ -28,17 +25,39 @@ apiRoutes.post('/authenticate', function(req, res) {
       res.json({ success: false, message: 'Authentication failed. User not found.' });
     } else if (user) {
 
-      if (user.attempts == 3) {
-        return res.json({success: false, message: 'User is blocked. contact an admin to remedy this.'});
+      var securityLog = new SecurityLog({
+        type: 0
+      });
+
+      var data = {
+        user : user.username,
+        id : user._id
       }
-      // check if password matches
-      if (user.password != req.body.password) {
-        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+
+      if (user.attempts == 3) {
+        var message = 'User is blocked. contact an admin to remedy this.'
+        data.message = message;
+        data.success = false;
+
+        securityLog.action = JSON.stringify(data);
+
+        res.json({success: false, message: message});
+      } else if (user.password != req.body.password) {
+        var message = 'Authentication failed. Wrong password';
+        res.json({ success: false, message: message});
         user.attempts = user.attempts + 1;
         user.save(function(err) {if (err) throw err;});
+
+        data.message = message;
+        data.success = false;
+
+        securityLog.action = JSON.stringify(data);
       } else {
         // if user is found and password is right
         // create a token
+        data.message = "User authenticated";
+        data.success = true;
+        securityLog.action = JSON.stringify(data);
         var token = jwt.sign({
           'user' : {
              '_id' : user._id,  
@@ -52,14 +71,17 @@ apiRoutes.post('/authenticate', function(req, res) {
 
         user.attempts = 0;
         user.save(function(err) {if (err) throw err;});
-
         // return the information including token as JSON
         res.json({
           success: true,
           message: 'Enjoy your token!',
           token: token
         });
-      }   
+      }
+
+      securityLog.save(function(err) {
+        if (err) throw err;
+      });   
 
     }
 
@@ -68,6 +90,7 @@ apiRoutes.post('/authenticate', function(req, res) {
 
 //route to add a user   
 apiRoutes.post('/adduser', function (req, res) {
+  console.log(req.body);
   var user = new User({
     'username' : req.body.username,
     'password' : req.body.password,

@@ -1,5 +1,20 @@
 var myApp = angular.module('managerApp', []);
 
+myApp.run(function($http, $window) {
+
+	if ($window.sessionStorage.token === 'null' || !$window.sessionStorage.token || $window.sessionStorage.token === 'undefined' || $window.sessionStorage.token == '') {
+		var url = "http://" + $window.location.host + "/";
+        $window.location.href = url;
+    }
+	$http.get("api/users/me", {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			if (response.data.userData.responsibility != 2) {
+				var url = "http://" + $window.location.host + "/home";
+		        $window.location.href = url;				
+			}
+	});				
+});
+
 myApp.factory('sharedInfo', function($http, $window) {
 
 	var getWorkerReports = function() {

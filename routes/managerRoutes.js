@@ -4,6 +4,7 @@ var express = require('express');
 var apiRoutes = express.Router(); 
 var WorkerReport = require('../app/models/workerreport');
 var UserReport = require('../app/models/userreport');
+var SecurityLog = require('../app/models/securityLog');
 var jwt = require('jsonwebtoken');
 var app = express();
 var bodyParser = require('body-parser');
@@ -56,7 +57,18 @@ apiRoutes.post('/workerReports/deleteReport/:id', function(req, res) {
 
   WorkerReport.remove({'_id': id}, function(err) {
     if (err) throw err;
+    var securityLog = new SecurityLog({
+      type: 4
+    });
 
+    var data = {
+      managerID : req.decoded['user']['_id'],
+      reportID : id
+    };
+
+    securityLog.action = JSON.stringify(data);
+
+    securityLog.save(function(err) {if (err) throw err});
     return res.json({success: true, message: 'Documents deleted successfully'});
   });
 
@@ -68,6 +80,17 @@ apiRoutes.post('/userReports/deleteReport/:id', function(req, res) {
 
   UserReport.remove({'_id': id}, function(err) {
     if (err) throw err;
+    var securityLog = new SecurityLog({
+      type: 4
+    });
+
+    var data = {
+      managerID : req.decoded['user']['_id'],
+      reportID : id
+    };
+
+    securityLog.action = JSON.stringify(data);
+    securityLog.save(function(err) {if (err) throw err});
 
     return res.json({success: true, message: 'Documents deleted successfully'});
   });

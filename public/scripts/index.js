@@ -50,7 +50,8 @@ myApp.controller('LoginController', function ($scope, $http, $window) {
             'password' : $scope.password,
             'address' : $scope.address,
             'title' : $scope.title,
-            'responsibility' : $scope.authorization
+            'responsibility' : $scope.authorization,
+            'email' : $scope.email
         }
         $http
           .post('api/users/addUser', $scope.user)

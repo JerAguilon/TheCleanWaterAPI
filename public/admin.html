@@ -15,13 +15,14 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<script src = "https://cdn.zingchart.com/zingchart.min.js" ></script>
 		<script src="scripts/Chart.min.js"></script>  
-		<script src="scripts/angular-chart.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular-sanitize.js"></script>
+
 		<!-- Optional Bootstrap theme -->
 	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 	 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
 
 
-	 	<link rel="stylesheet" href="css/home.css">
+	 	<link rel="stylesheet" href="css/admin.css">
 
 	
 		<script src="/scripts/admin.js"></script>
@@ -79,6 +80,30 @@
 			</div>
 	
 		</div>
-
+		<div class="container" id="map" ng-controller="LogController">
+			<div class="jumbotron" width="100%">
+			  <h2>User Options</h2>
+			  <div class="table-responsive">
+			  <table class="table">
+				<thead>
+			        <th>Date</th>
+			        <th>Action Type</th>
+			        <th>Description</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="x in log">
+						<td>{{x.createdAt}}</td>
+						<td>{{x.type}}</td>
+						<div>
+							<td><pre ng-bind-html="x.action | prettify"></pre></td>
+						
+						</div>
+					</tr>						
+				</tbody>	
+			  </table>
+			  </div>
+			</div>
+	
+		</div>
 	</body>
 </html>
