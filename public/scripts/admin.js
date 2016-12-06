@@ -150,6 +150,11 @@ myApp.controller('LogController', function ($scope, $http, $window, sharedInfo) 
 	    });
 	}
 
+	function getDate(d) {
+		return d.getDate()  + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " +
+				d.getHours() + ":" + d.getMinutes();
+	}
+
 	function getType(item) {
 		if (item == 0) {
 			return "Log in";
@@ -169,7 +174,7 @@ myApp.controller('LogController', function ($scope, $http, $window, sharedInfo) 
 	sharedInfo.getLog().then(function(result) {
 		for (i = 0; i < result.data.length; i++) {
 			result.data[i].type = getType(result.data[i].type);
-			//result.data[i].action = syntaxHighlight(result.data[i].action);
+			result.data[i].createdAt = getDate(new Date(result.data[i].createdAt));
 		}
 
 		$scope.log = result.data;
