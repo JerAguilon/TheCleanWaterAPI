@@ -4,9 +4,16 @@ myApp.run(function($http, $window) {
 		if ($window.sessionStorage.token === 'null' || !$window.sessionStorage.token || $window.sessionStorage.token === 'undefined' || $window.sessionStorage.token == '') {
 			var url = "http://" + $window.location.host + "/";
             $window.location.href = url;
+        } else  {
+			$http.get("api/users/me", {headers : {'x-access-token' : $window.sessionStorage.token}
+			}).then(function (response) {
+				if (response.data.userData.responsibility != 3) return;
+
+				var url = "http://" + $window.location.host + "/admin";
+	            $window.location.href = url;
+			});		        	
         }
 
-        console.log($window.sessionStorage);
 });
 
 myApp.factory('sharedInfo', function($http, $window) {
@@ -46,10 +53,7 @@ myApp.factory('sharedInfo', function($http, $window) {
 		getMe: getMe,
 		getWorkerReportsByYear : getWorkerReportsByYear
 	}
-
-
 });
-
 
 myApp.controller('TableController', function ($scope, $http, $window, sharedInfo) {
 	sharedInfo.getUserReports().then(function(result) {
@@ -84,7 +88,21 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 			}
 		}
 	});
-	sharedInfo.getWorkerReports().then(function(result) {
+
+	sharedInfo.getMe().then(function(result) {
+		if (result.data.userData.responsibility == 2) {
+			$scope.isManager = true;
+
+			getWorkerReports();
+		}
+
+		if (result.data.userData.responsibility > 0 && result.data.userData.responsibility != 3) {
+			$scope.isWorker = true;
+		}
+	});
+
+	var getWorkerReports = function() {
+		sharedInfo.getWorkerReports().then(function(result) {
 		$scope.workerReports = result.data;
 
 		for (i = 0; i < $scope.workerReports.length; i++) {
@@ -104,7 +122,33 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 
 			
 		}
-	});
+		});
+	};
+
+	$scope.deleteUserEntry = function(id) {
+		
+		$scope.token = {
+	        'token' : $window.sessionStorage.token
+		}
+		$http.post("api/manager/userReports/deleteReport/" + id, JSON.stringify($scope.token)
+			).then(function (response) {
+				alert(response.data.message);
+				$window.location.reload();
+			});			
+	}
+
+	$scope.deleteWorkerEntry = function(id) {
+		
+		$scope.token = {
+	        'token' : $window.sessionStorage.token
+		}
+		$http.post("api/manager/workerReports/deleteReport/" + id, JSON.stringify($scope.token)
+			).then(function (response) {
+				alert(response.data.message);
+				$window.location.reload();
+			});			
+	}
+
 	$scope.submitReport = function (form) {
 		if (form.$name == 'userReportForm') {
 		    $scope.report = {
@@ -151,9 +195,6 @@ myApp.controller('TableController', function ($scope, $http, $window, sharedInfo
 
 
 	};
-
-
-
 });
 
 myApp.controller('UserController', function ($scope, $http, $window, sharedInfo) {
@@ -271,8 +312,55 @@ myApp.controller('mapController', function($http, $scope, $interval, $window, Ng
 			});
 		}	
 
+	});
 
+	//
+	sharedInfo.getWorkerReports().then(function (response) {
+		vm.managerPositions = [];		
+		if (Object.prototype.toString.call( response.data ) === '[object Array]') {
+			console.log("FOO");
+		  	var foundData = {userReports:[]};
+			foundData.userReports = response.data; 
 
+			for (i = 0; i < foundData.userReports.length; i++) {
+				var item = foundData.userReports[i];
+				var location = item.location;
+
+				list = location.split(",");
+
+				if (list.length != 2) continue;
+
+				x = list[0];
+				y = list[1];
+
+				if (isNaN(x) || isNaN(y)) {
+					continue;
+				}
+
+				var item = foundData.userReports[i];
+				var date = new Date(item.date);
+
+				item.date = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+
+				if (item.waterPurityCondition == 0) {
+					item.waterPurityCondition = "Safe";
+				} else if (item.waterPurityCondition == 1) {
+					item.waterPurityCondition = "Treatable";
+				} else if (item.waterPurityCondition == 2) {
+					item.waterPurityCondition = "Unsafe";
+				}
+
+				vm.managerPositions.push({pos:[x, y],
+					date: item.date,
+					reporterName: item.reporterName,
+					virusPPM: item.virusPPM,
+					contaminantPPM: item.contaminantPPM,
+					waterPurityCondition: item.waterPurityCondition
+				});
+			}
+		}
+	  	
+			
 	});
 
 	$scope.showData = function(obj) {
@@ -282,6 +370,15 @@ myApp.controller('mapController', function($http, $scope, $interval, $window, Ng
 				"\nType: " + this.type;
 		alert(output);
 	}
+
+	$scope.showManagerData = function(obj) {
+		var output = "Location: " + this.latitude + ", " + this.longitude + "\n" + 
+				"Reporter: " + this.reporter + 
+				"\nCondition: " + this.condition +
+				"\nVirus PPM: " + this.virusppm +
+				"\nContaminant PPM: " + this.contaminantppm;
+		alert(output);
+	}
 });
 
 myApp.controller("chartController", function ($scope, sharedInfo) {
@@ -289,7 +386,7 @@ myApp.controller("chartController", function ($scope, sharedInfo) {
 
 
   sharedInfo.getMe().then(function(response) {
-  	if (response.data.userData.responsibility > 1) {
+  	if (response.data.userData.responsibility == 2) {
   		$scope.shouldShow = true;
   	} else {
   		$scope.shouldShow = false;
@@ -366,11 +463,12 @@ myApp.controller("chartController", function ($scope, sharedInfo) {
   $scope.init();
 });
 
+
 myApp.controller('NavbarController', function ($scope, $http, $window, sharedInfo) {
 	$scope.isManager = false;
 
 	  sharedInfo.getMe().then(function(response) {
-	  	if (response.data.userData.responsibility > 2) {
+	  	if (response.data.userData.responsibility == 2) {
 	  		$scope.isManager = true;
 	  	} else {
 	  		$scope.isManager = false;

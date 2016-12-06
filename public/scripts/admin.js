@@ -15,6 +15,8 @@ myApp.run(function($http, $window) {
 	});				
 });
 
+
+
 myApp.filter('prettify', function () {
     
     function syntaxHighlight(json) {
@@ -40,6 +42,13 @@ myApp.filter('prettify', function () {
 });
 
 myApp.factory('sharedInfo', function($http, $window) {
+	var getMe = function() {
+		return $http.get("api/users/me", {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			return response;
+		});				
+	}
+
 
 	var getUsers = function() {
 		return $http.get("api/admin/users/view", {headers : {'x-access-token' : $window.sessionStorage.token}
@@ -56,8 +65,65 @@ myApp.factory('sharedInfo', function($http, $window) {
 	}
 	return {
 		getUsers: getUsers,
-		getLog : getLog
+		getLog : getLog,
+		getMe: getMe
 	}
+});
+
+myApp.controller('ProfileController', function ($scope, $http, $window, sharedInfo) {
+	function getProfileInfo() {
+		sharedInfo.getMe().then(function(response) {
+			if (response.data.userData.responsibility == 0) $scope.role = "User";
+			else if (response.data.userData.responsibility == 1) $scope.role = "Worker";
+			else if (response.data.userData.responsibility == 2) $scope.role = "Manager";
+			else if (response.data.userData.responsibility == 3) $scope.role = "Administrator";
+
+			$scope.user = response.data.userData;
+
+		});		
+	}
+
+	$scope.init = function() {
+		getProfileInfo()
+	}
+
+	$scope.updateUser = function(profileInfo) {
+		$scope.profileInfo = {};
+
+		if ($scope.email) $scope.profileInfo.email = $scope.email; 
+		if ($scope.address) $scope.profileInfo.address = $scope.address;
+		if ($scope.title) $scope.profileInfo.title = $scope.title;
+
+
+		var req = {
+			headers : {'x-access-token' : $window.sessionStorage.token},
+			method:'POST',
+			data: $scope.profileInfo,
+			url: 'api/users/me/update'
+		};
+	    $http(req)
+	      .success(function (data, status, headers, config) {
+	        if (data.success) {
+	        	console.log(data);
+	        	alert('User updated successfully');
+	        	getProfileInfo();
+	        } else {
+	            alert(data.message);
+	        }
+
+	      	})
+	      	.error(function (data, status, headers, config) {
+	       		alert(data.message); 
+	      	});        			
+	}
+	$scope.logoff = function() {
+		$window.sessionStorage.token = null;
+		var url = "http://" + $window.location.host + "/";
+        $window.location.href = url;
+
+	}
+
+	$scope.init();
 });
 
 myApp.controller('UserController', function ($scope, $http, $window, sharedInfo) {

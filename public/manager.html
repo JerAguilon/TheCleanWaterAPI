@@ -73,37 +73,5 @@
 			</div>
 	
 		</div>
-
-		<div class="container" id="map" ng-controller="UserReportController">
-			<div class="jumbotron" width="100%">
-			  <h2>User Reports</h2>
-			  <div class="table-responsive">
-			  <table class="table">
-				<thead>
-					<th></th>
-					<th>ID</th>
-			        <th>Date</th>
-			        <th>Reporter</th>
-			        <th>Water Source Type</th>
-			        <th>Water Source Condition</th>
-				</thead>
-					<tr ng-repeat="x in workerReports">
-						<td>
-						  	<button type="button" class="btn btn-danger btn-sm" ng-click="deleteEntry(x._id)">Delete Entry</button>
-						</td>
-						<td>{{x._id}}</td>
-						<td>{{x.date}}</td>
-						<td>{{x.reporterName}}</td>
-						<td>{{x.waterSourceType}}</td>
-						<td>{{x.waterSourceCondition}}</td>
-
-					</tr>						
-				</tbody>	
-			  </table>
-			  </div>
-			</div>
-	
-		</div>
-
 	</body>
 </html>

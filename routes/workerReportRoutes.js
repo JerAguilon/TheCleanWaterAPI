@@ -30,7 +30,7 @@ apiRoutes.use(function(req, res, next) {
     str = JSON.stringify(decoded);
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else if (decoded['rights'] < 0) {
+      } else if (decoded['rights'] < 1 || decoded['rights'] == 4) {
         return res.json({ success: false, message: 'Insuficcient rights to view this data.' });    
       } else {
         // if everything is good, save to request for use in other routes
@@ -58,14 +58,22 @@ apiRoutes.post('/submit', function(req, res) {
       return res.json({ success: false, message: 'User is banned.' });    
   }
 
-	var report = new WorkerReport({
-		'waterPurityCondition' : req.body.waterPurityCondition,
-		'reporterName' : req.decoded.user.username,
-		'location' : req.body.location,
+  var entry = {'waterPurityCondition' : req.body.waterPurityCondition,
+    'reporterName' : req.decoded.user.username,
+    'location' : req.body.location,
     'virusPPM' : req.body.virusPPM,
     'contaminantPPM' : req.body.contaminantPPM,
     'date' : new Date(req.body.date)
-	});
+  };
+	var report = new WorkerReport(entry);
+
+
+  WorkerReport.findOne({entry}, function(err, report) {
+    if (err) throw err;
+    if (report) {
+      return res.json({success: false, message: 'Report already exists.'})
+    } 
+  });
 
   report.save(function(err) {
     if (err) {
@@ -81,6 +89,40 @@ apiRoutes.post('/submit', function(req, res) {
     'message' : 'Worker report added'   
   });
 });
+
+// route middleware to verify a token, rights must be >= 0
+apiRoutes.use(function(req, res, next) {
+
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, app.get('superSecret'), function(err, decoded) {     
+    str = JSON.stringify(decoded);
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+      } else if (decoded['rights'] != 2) {
+        return res.json({ success: false, message: 'Insuficcient rights to view this data.' });    
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;    
+        next();
+      }
+    });
+
+  } else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({ 
+        success: false, 
+        message: 'No token provided.' 
+    });
+    
+  }
+});
+
 
 apiRoutes.get('/view', function(req, res) {
 

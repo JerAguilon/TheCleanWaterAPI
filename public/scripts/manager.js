@@ -1,4 +1,4 @@
-var myApp = angular.module('managerApp', []);
+var myApp = angular.module('managerApp', ['chart.js']);;
 
 myApp.run(function($http, $window) {
 
@@ -30,9 +30,18 @@ myApp.factory('sharedInfo', function($http, $window) {
 			return response;
 		});				
 	}	
+	var getWorkerReportsByYear = function(location, year) {
+		var query = "api/workerReports/view/location/" + location + "/year/" + year;
+
+		return $http.get(query, {headers : {'x-access-token' : $window.sessionStorage.token}
+		}).then(function (response) {
+			return response;
+		});	
+	}
 	return {
 		getWorkerReports: getWorkerReports,
-		getUserReports: getUserReports
+		getUserReports: getUserReports,
+		getWorkerReportsByYear : getWorkerReportsByYear
 	}
 
 

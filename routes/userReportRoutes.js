@@ -32,7 +32,7 @@ apiRoutes.use(function(req, res, next) {
     str = JSON.stringify(decoded);
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else if (decoded['rights'] < 0) {
+      } else if (decoded['rights'] < 0 || decoded['rights'] == 3) {
         return res.json({ success: false, message: 'Insuficcient rights to view this data.' });    
       } else {
         // if everything is good, save to request for use in other routes

@@ -98,13 +98,14 @@
 			</div> 
 		</div>
 
-		<div class="container" ng-controller="TableController">
+		<div class="container" id="reports" ng-controller="TableController">
 			<div class="jumbotron">
 			  <h2>User Reports</h2>
 			  <p>Standard water reports are submitted by everyday users and displayed here</p>
 			  <div class="table-responsive">
 			  <table class="table">
 				<thead>
+					<th ng-show='isManager'></th>
 			        <th>Date</th>
 			        <th>Reporter</th>
 			        <th>Location</th>
@@ -113,6 +114,9 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="x in userReports">
+						<td ng-show = "isManager">
+						  	<button type="button" class="btn btn-danger btn-sm" ng-click="deleteUserEntry(x._id)">Delete Entry</button>
+						</td>	
 						<td>{{x.date}}</td>
 						<td>{{x.reporterName}}</td>
 						<td>{{x.location}}</td>
@@ -164,13 +168,14 @@
 
 		</div>
 
-		<div class="container" id="reports" ng-controller="TableController">
-			<div class="jumbotron">
+		<div class="container" ng-controller="TableController">
+			<div class="jumbotron" ng-show='isWorker'>
 			  <h2>Worker Reports</h2>
 			  <p>More specific purity reports are submitted by worker and displayed here</p>
 			  <div class="table-responsive">
-			  <table class="table">
+			  <table class="table" ng-show=isManager>
 				<thead>
+					<th></th>
 			        <th>Date</th>
 			        <th>Reporter</th>
 			        <th>Location</th>
@@ -180,6 +185,9 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="x in workerReports">
+						<td>
+						  	<button type="button" class="btn btn-danger btn-sm" ng-click="deleteWorkerEntry(x._id)">Delete Entry</button>
+						</td>					
 						<td>{{x.date}}</td>
 						<td>{{x.reporterName}}</td>
 						<td>{{x.location}}</td>
@@ -226,8 +234,6 @@
 
 		</div>
 
-
-
 		<div class="container" id="map" ng-controller="mapController as vm">
 			<div class="jumbotron">
 				<h2>Water Report Map</h2>
@@ -242,9 +248,20 @@
 				      on-click="showData($event)"
 				      position="{{p.pos}}">
 				    </marker>
+
+				    <marker ng-repeat="p in vm.managerPositions track by $index"
+				      id="custom-marker-{{$index}}"
+				      reporter={{p.reporterName}}
+				      condition={{p.waterPurityCondition}}
+				      contaminantPPM={{p.contaminantPPM}}
+				      virusPPM={{p.virusPPM}} 
+				      latitude={{p.pos[0]}}
+				      longitude={{p.pos[1]}}
+				      on-click="showManagerData($event)"
+				      position="{{p.pos}}">
+				    </marker>
 				  </ng-map>						
 			</div>
-	
 		</div>
 
 		<div id="chart" ng-show=shouldShow class="container" ng-controller="chartController">
@@ -275,6 +292,7 @@
 
 
 		</div>
+
 
 
 	</body>
